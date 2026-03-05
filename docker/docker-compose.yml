@@ -1,0 +1,71 @@
+services:
+  # 主分析服务（批处理，一次性运行）
+  customer-churn-analysis:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: customer_churn_analysis
+    # 删除了 user: root，默认使用 Dockerfile 中的 appuser 以保证权限安全
+    volumes:
+      - ../data:/app/data
+      - ../output:/app/output
+      - ../logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - DATA_PATH=/app/data
+      - OUTPUT_PATH=/app/output
+      - LOG_LEVEL=INFO
+    command: python run_analysis.py
+    networks:
+      - churn-network
+
+  # Nginx 用于展示可视化结果
+  nginx:
+    image: nginx:alpine
+    container_name: customer_churn_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../output/visualizations:/usr/share/nginx/html:ro
+    depends_on:
+      - customer-churn-analysis
+    networks:
+      - churn-network
+    restart: unless-stopped
+
+  # Jupyter（可选，常驻）
+  jupyter:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.jupyter
+    container_name: customer_churn_jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ../data:/app/data
+      - ../output:/app/output
+      - ../notebooks:/app/notebooks
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - PYTHONPATH=/app
+    networks:
+      - churn-network
+    restart: unless-stopped
+
+  # Redis（可选）
+  redis:
+    image: redis:7-alpine
+    container_name: customer_churn_redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - churn-network
+    restart: unless-stopped
+
+networks:
+  churn-network:
+    driver: bridge
+
+volumes:
+  redis_data:

@@ -1,0 +1,40 @@
+# --- Python 缓存与字节码 ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+coverage.xml
+
+# --- 虚拟环境 ---
+.venv/
+venv/
+env/
+.conda/
+conda-meta/
+
+# --- 项目元数据与文档 ---
+.git/
+.gitignore
+.github/          # 新增：CI 配置不需要打包进镜像
+README.md
+LICENSE
+docs/
+notebooks/        # 修正：你的目录树中叫 notebooks/
+tests/            # 已经包含，确保构建时不带测试代码
+
+# --- Jupyter 临时文件 ---
+.ipynb_checkpoints/
+
+# --- 数据与输出 (关键：通过 Volume 挂载，不打包进镜像) ---
+output/
+logs/
+cache/
+data/processed/
+# data/customer_churn_data.xlsx  # 选填：如果你的镜像需要自带演示数据则不忽略，否则建议忽略
+
+# --- 编辑器与系统文件 ---
+.vscode/
+.idea/
+.DS_Store         # 新增：macOS 用户必备
+Thumbs.db         # 新增：Windows 用户必备
