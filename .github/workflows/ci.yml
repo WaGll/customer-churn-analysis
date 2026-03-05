@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: [3.9, 3.12, 3.11]
 
     steps:
     - uses: actions/checkout@v4
@@ -82,8 +82,7 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    # 1. 修正了 Dockerfile 路径 (-f docker/Dockerfile)
-    # 2. 通过 .dockerignore 忽略 output 文件夹（见下方建议）
+    
     - name: Build Docker image
       run: |
         docker build -t customer-churn-analysis:latest -f docker/Dockerfile .
